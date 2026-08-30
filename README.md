@@ -6,9 +6,9 @@ Bowerkeep is a personal, native iPhone app for rapidly scanning individual Engli
 
 ## Status
 
-Bowerkeep is in pre-implementation planning. The approved scope and architecture are documented in the [MVP implementation plan](docs/superpowers/plans/2026-08-30-bowerkeep-mvp.md), and delivery is tracked in the [Bowerkeep MVP milestone](https://github.com/auleewilliams/Bowerkeep/milestone/1).
+Bowerkeep is in early implementation. The approved scope and architecture are documented in the [MVP implementation plan](docs/superpowers/plans/2026-08-30-bowerkeep-mvp.md), and delivery is tracked in the [Bowerkeep MVP milestone](https://github.com/auleewilliams/Bowerkeep/milestone/1).
 
-The first implementation issue is [#1: Create the Xcode project and module scaffold](https://github.com/auleewilliams/Bowerkeep/issues/1).
+The native iOS project and its app, unit-test, and UI-test targets live under `apps/ios`.
 
 ## MVP principles
 
@@ -66,13 +66,29 @@ The complete rules are in [AGENTS.md](AGENTS.md). Do not implement directly on `
 
 ## Build and test
 
-Issue #1 will establish the Xcode project and its schemes. After it lands, list the available schemes with:
+List the shared project schemes with:
 
 ```sh
 xcodebuild -project apps/ios/Bowerkeep.xcodeproj -list
 ```
 
-Use an installed iPhone 15-or-newer simulator for builds and tests, and record the exact commands and destinations in each pull request.
+Use an installed iPhone 15-or-newer simulator for builds and tests. Replace the example destination with an installed device and OS shown by `xcrun simctl list devices available`:
+
+```sh
+xcodebuild \
+  -project apps/ios/Bowerkeep.xcodeproj \
+  -scheme Bowerkeep \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0' \
+  build
+
+xcodebuild \
+  -project apps/ios/Bowerkeep.xcodeproj \
+  -scheme Bowerkeep \
+  -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0' \
+  test
+```
+
+Record the exact commands and destination in each pull request.
 
 ## Data and privacy
 
