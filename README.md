@@ -26,11 +26,17 @@ The first implementation issue is [#1: Create the Xcode project and module scaff
 - An iOS 18-or-newer simulator or an iPhone 15-or-newer development device.
 - Git and GitHub CLI for the issue-per-branch workflow.
 
-After installing Xcode, launch it once to complete first-run setup, then verify the selected developer directory:
+After installing Xcode, launch it once to complete first-run setup, then inspect the selected developer directory and Xcode version:
 
 ```sh
-sudo xcode-select -s /Applications/Xcode.app/Contents/Developer
+xcode-select -p
 xcodebuild -version
+```
+
+If the selected path still points to Command Line Tools or another unintended toolchain, locate the installed Xcode application and switch explicitly. For the standard App Store location, the command is:
+
+```sh
+sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
 ```
 
 ## Repository layout

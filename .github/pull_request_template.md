@@ -22,13 +22,15 @@ Include screenshots or recordings for visible UI changes. Remove this section wh
 
 ## Checklist
 
+Check each applicable item. For a conditional item that does not apply, add `N/A` and a short reason in the pull request description.
+
 - [ ] The change is limited to one implementation issue.
 - [ ] Acceptance criteria in the issue are satisfied.
-- [ ] Behavior changes were developed test-first and have regression coverage.
-- [ ] Relevant build, unit, UI, migration, performance, or backup tests pass.
-- [ ] Swift 6 concurrency checks pass without unexplained unsafe annotations.
+- [ ] If behavior changed, it was developed test-first and has regression coverage.
+- [ ] Applicable build, unit, UI, migration, performance, or backup tests pass.
+- [ ] If Swift code changed, Swift 6 concurrency checks pass without unexplained unsafe annotations.
 - [ ] No scan images, personal databases, backups, private fixtures, or secrets are tracked.
-- [ ] Persistence changes are versioned, transactional, and migration-tested.
-- [ ] UI changes support accessibility and include visual evidence.
+- [ ] If persistence changed, it is versioned, transactional, and migration-tested.
+- [ ] If UI changed, it supports accessibility and includes visual evidence.
 - [ ] Documentation reflects any changed behavior or architecture.
 - [ ] `git diff --check` passes and the branch contains no unrelated changes.

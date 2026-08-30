@@ -16,6 +16,7 @@ build/
 *.hmap
 *.ipa
 *.app
+*.xcarchive
 *.dSYM
 *.dSYM.zip
 *.xcresult
@@ -51,6 +52,7 @@ Package.pins
 /fixtures/private/
 PrivateFixtures/
 *.bowerkeep
+*.sqlite-journal
 *.sqlite-shm
 *.sqlite-wal
 
