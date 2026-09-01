@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..600&family=Archivo:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#e7e2d6;font-family:Archivo,system-ui,sans-serif}
+a{color:#3d5c47}a:hover{color:#2b4133}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}
+.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 20px}
+.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1f1c17;color:#f4f0e6;border-radius:4px;text-decoration:none}
+.dv-tname{font:600 13px/1.2 Archivo,system-ui,sans-serif;color:#1f1c17}
+.dv-opts{display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+.dv-opt{flex:none;display:flex;flex-direction:column;gap:10px;scroll-margin-top:16px}
+.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1f1c17;border-radius:5px;text-decoration:none}
+.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11.5px/1.3 Archivo,system-ui,sans-serif;color:rgba(0,0,0,.55);max-width:402px}
+.dv-opt:target .dv-oid{background:#3d5c47;color:#fff}
+.dv-next{margin:24px 0 0;font:12px/1.6 Archivo,system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.dv-note{max-width:640px;font:13px/1.65 Archivo,system-ui,sans-serif;color:rgba(0,0,0,.62);margin:0 0 22px}
+</style></helmet>
+
+<section class="dv-turn" id="t1">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Bowerkeep — first direction</span></div>
+<p class="dv-note">The repo is pre-implementation, so nothing here is a recreation: it is built from the MVP plan's vocabulary (exact printing, physical copy, indicative value, Collection / Decks / Scan / Value) and the A$20 threshold. Direction is collector-warm: paper ground, ink text, Lora for card names, Archivo for UI, mono for set codes and money. Card art is a placeholder — real art comes from cached Scryfall URLs at runtime. <a href="#1a">1a</a> is clickable: shutter advances the scan flow, chips filter, rows open, Move… relocates a copy. Scan now uses the <a href="#1c">1c</a> overlay — full-bleed camera, corner brackets, tally in the corner, readout on one line.</p>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Interactive prototype — scan → finish → review → summary, and collection → filter → detail → move to deck</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:#f2ede2;font-family:Archivo,system-ui,sans-serif;color:#1f1c17;overflow:hidden">
+
+<sc-if value="{{ isScan }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;background:#14120f">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,#211d18 0 9px,#1a1712 9px 18px);opacity:.9"></div>
+
+  <div style="position:absolute;top:68px;left:18px;right:18px;z-index:5;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+    <div style="display:flex;flex-direction:column;gap:6px;width:130px">
+      <div onClick="{{ endSession }}" style="font:600 12.5px/1 Archivo,sans-serif;color:#c8b06a;cursor:pointer;padding:2px 0">Done</div>
+      <div style="height:3px;width:100%;border-radius:2px;background:rgba(244,240,230,.16)">
+        <div style="height:3px;border-radius:2px;background:{{ guideColor }};width:{{ conf1 }}"></div>
+      </div>
+      <span style="font:500 9px/1.35 JetBrains Mono,monospace;letter-spacing:.08em;color:rgba(244,240,230,.5)">{{ steadyLabel }}</span>
+    </div>
+    <div style="text-align:right">
+      <div style="font:700 34px/1 JetBrains Mono,monospace;color:#f4f0e6">{{ tallyCount }}</div>
+      <div style="font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:rgba(244,240,230,.5);margin-top:4px">INTO COLLECTION</div>
+    </div>
+  </div>
+
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center">
+    <div style="position:relative;width:268px;height:374px">
+      <div style="position:absolute;left:0;top:0;width:34px;height:34px;border-left:3px solid {{ guideColor }};border-top:3px solid {{ guideColor }};border-radius:10px 0 0 0"></div>
+      <div style="position:absolute;right:0;top:0;width:34px;height:34px;border-right:3px solid {{ guideColor }};border-top:3px solid {{ guideColor }};border-radius:0 10px 0 0"></div>
+      <div style="position:absolute;left:0;bottom:0;width:34px;height:34px;border-left:3px solid {{ guideColor }};border-bottom:3px solid {{ guideColor }};border-radius:0 0 0 10px"></div>
+      <div style="position:absolute;right:0;bottom:0;width:34px;height:34px;border-right:3px solid {{ guideColor }};border-bottom:3px solid {{ guideColor }};border-radius:0 0 10px 0"></div>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:18px;right:18px;bottom:170px;z-index:5;display:flex;align-items:baseline;gap:10px">
+    <span style="font:600 22px/1.1 Lora,serif;color:{{ readoutColor }}">{{ ocrTitle }}</span>
+    <span style="font:500 12px/1 JetBrains Mono,monospace;color:rgba(244,240,230,.6);flex:1">{{ ocrLine }}</span>
+    <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.1em;color:{{ guideColor }}">{{ lockLabel }}</span>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:82px;height:88px;z-index:6;display:flex;align-items:center;justify-content:center;background:linear-gradient(rgba(20,18,15,0),rgba(20,18,15,.85) 55%)">
+    <div onClick="{{ shutter }}" style="width:76px;height:76px;border-radius:9999px;background:#f4f0e6;box-shadow:0 0 0 5px rgba(244,240,230,.16);cursor:pointer;display:flex;align-items:center;justify-content:center" style-active="transform:scale(.94)">
+      <div style="width:60px;height:60px;border-radius:9999px;border:1.5px solid rgba(31,28,23,.16)"></div>
+    </div>
+    <div onClick="{{ undo }}" style="position:absolute;right:24px;bottom:30px;cursor:pointer">
+      <span style="font:600 12.5px/1 Archivo,sans-serif;color:{{ undoColor }}">Undo</span>
+    </div>
+  </div>
+
+  <sc-if value="{{ showTally }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;left:18px;right:18px;bottom:212px;z-index:5;display:flex;flex-direction:column;gap:6px">
+    <sc-for list="{{ tally }}" as="t" hint-placeholder-count="2">
+      <div style="display:flex;align-items:center;gap:9px;background:rgba(61,92,71,.92);border-radius:10px;padding:8px 11px">
+        <span style="font:700 11px/1 JetBrains Mono,monospace;color:#cfe0d3">+1</span>
+        <span style="font:600 14px/1.1 Lora,serif;color:#f4f0e6;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ t.name }}</span>
+        <span style="font:500 10px/1 JetBrains Mono,monospace;color:rgba(244,240,230,.6)">{{ t.code }}</span>
+      </div>
+    </sc-for>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showFinish }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:20;background:rgba(14,12,10,.6);display:flex;align-items:flex-end">
+    <div style="width:100%;background:#f2ede2;border-radius:22px 22px 0 0;padding:20px 20px 46px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.13em;color:#8a8172">FINISH REQUIRED</span>
+        <span style="font:600 22px/1.15 Lora,serif">Cyclonic Rift</span>
+        <span style="font:400 12px/1.4 Archivo,sans-serif;color:#6b6459">Return to Ravnica · 51 · three finishes exist for this printing</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div onClick="{{ pickNonFoil }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <span style="font:600 15px/1 Archivo,sans-serif">Non-foil</span><span style="font:500 12px/1 JetBrains Mono,monospace;color:#6b6459">A$42.60</span>
+        </div>
+        <div onClick="{{ pickFoil }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <span style="font:600 15px/1 Archivo,sans-serif">Foil</span><span style="font:500 12px/1 JetBrains Mono,monospace;color:#6b6459">A$88.10</span>
+        </div>
+        <div onClick="{{ pickEtched }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <span style="font:600 15px/1 Archivo,sans-serif">Etched</span><span style="font:500 12px/1 JetBrains Mono,monospace;color:#8a8172">no price</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ showReview }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:20;background:rgba(14,12,10,.6);display:flex;align-items:flex-end">
+    <div style="width:100%;background:#f2ede2;border-radius:22px 22px 0 0;padding:20px 20px 46px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.13em;color:#8f6b2f">REVIEW — NO EXACT PRINTING</span>
+        <span style="font:600 22px/1.15 Lora,serif">Counterspell</span>
+        <span style="font:400 12px/1.4 Archivo,sans-serif;color:#6b6459">Footer unreadable. Ranked by collector number, year and frame.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div onClick="{{ pickCandidate }}" style="display:flex;gap:12px;padding:12px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <div style="width:40px;height:56px;border-radius:4px;background:repeating-linear-gradient(135deg,#e3ddcd 0 5px,#d8d1bf 5px 10px)"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            <span style="font:600 14.5px/1.15 Lora,serif">Ice Age · 64</span>
+            <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">1995 · old frame · EN</span>
+          </div>
+          <span style="font:500 11px/1 JetBrains Mono,monospace;color:#3d5c47;align-self:center">82%</span>
+        </div>
+        <div onClick="{{ pickCandidate }}" style="display:flex;gap:12px;padding:12px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <div style="width:40px;height:56px;border-radius:4px;background:repeating-linear-gradient(135deg,#e3ddcd 0 5px,#d8d1bf 5px 10px)"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            <span style="font:600 14.5px/1.15 Lora,serif">Tempest · 79</span>
+            <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">1997 · old frame · EN</span>
+          </div>
+          <span style="font:500 11px/1 JetBrains Mono,monospace;color:#6b6459;align-self:center">61%</span>
+        </div>
+        <div onClick="{{ pickCandidate }}" style="display:flex;gap:12px;padding:12px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <div style="width:40px;height:56px;border-radius:4px;background:repeating-linear-gradient(135deg,#e3ddcd 0 5px,#d8d1bf 5px 10px)"></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:3px">
+            <span style="font:600 14.5px/1.15 Lora,serif">7th Edition · 88</span>
+            <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">2001 · old frame · EN</span>
+          </div>
+          <span style="font:500 11px/1 JetBrains Mono,monospace;color:#6b6459;align-self:center">44%</span>
+        </div>
+      </div>
+      <div onClick="{{ pickCandidate }}" style="text-align:center;font:600 13px/1 Archivo,sans-serif;color:#3d5c47;padding:6px;cursor:pointer">View all 31 printings</div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ isSummary }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#f2ede2;padding:66px 20px 40px;display:flex;flex-direction:column;gap:18px;overflow:auto">
+  <div style="display:flex;flex-direction:column;gap:4px">
+    <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.13em;color:#8a8172">SESSION ENDED · 14 MIN</span>
+    <span style="font:600 30px/1.1 Lora,serif">{{ tallyCount }} cards filed</span>
+    <span style="font:400 13px/1.45 Archivo,sans-serif;color:#6b6459">All into Collection, Near Mint by default.</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+    <div style="background:#faf7f0;border:1px solid rgba(31,28,23,.1);border-radius:12px;padding:13px">
+      <div style="font:700 24px/1 JetBrains Mono,monospace">3</div>
+      <div style="font:500 11px/1.3 Archivo,sans-serif;color:#6b6459;margin-top:5px">Unresolved — sent to review</div>
+    </div>
+    <div style="background:#faf7f0;border:1px solid rgba(31,28,23,.1);border-radius:12px;padding:13px">
+      <div style="font:700 24px/1 JetBrains Mono,monospace;color:#8f6b2f">2</div>
+      <div style="font:500 11px/1.3 Archivo,sans-serif;color:#6b6459;margin-top:5px">New cards over A$20</div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:0;background:#faf7f0;border:1px solid rgba(31,28,23,.1);border-radius:12px;overflow:hidden">
+    <div style="padding:11px 14px;border-bottom:1px solid rgba(31,28,23,.08);font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">NEW HIGH VALUE</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;border-bottom:1px solid rgba(31,28,23,.06)">
+      <span style="font:600 15px/1.1 Lora,serif;flex:1">Cyclonic Rift</span>
+      <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">RTR·51 F</span>
+      <span style="font:600 13px/1 JetBrains Mono,monospace;color:#8f6b2f">A$88.10</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 14px">
+      <span style="font:600 15px/1.1 Lora,serif;flex:1">Rhystic Study</span>
+      <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">PCY·45 NF</span>
+      <span style="font:600 13px/1 JetBrains Mono,monospace;color:#8f6b2f">A$61.40</span>
+    </div>
+  </div>
+  <div style="font:400 11px/1.5 Archivo,sans-serif;color:#8a8172">Indicative retail-market values from Scryfall USD, converted at the ECB daily rate. Not an offer.</div>
+  <div style="display:flex;gap:10px;margin-top:auto">
+    <div onClick="{{ reviewUnresolved }}" style="flex:1;text-align:center;padding:15px;border-radius:12px;border:1px solid rgba(31,28,23,.16);font:600 14px/1 Archivo,sans-serif;cursor:pointer">Review 3</div>
+    <div onClick="{{ backToScan }}" style="flex:1;text-align:center;padding:15px;border-radius:12px;background:#3d5c47;color:#f4f0e6;font:600 14px/1 Archivo,sans-serif;cursor:pointer">Scan again</div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isCollection }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#f2ede2;display:flex;flex-direction:column;padding-top:59px">
+  <div style="padding:8px 18px 10px;display:flex;align-items:flex-end;justify-content:space-between">
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <span style="font:600 27px/1.1 Lora,serif">Collection</span>
+      <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#8a8172">{{ copyCount }} PHYSICAL COPIES · {{ printingCount }} PRINTINGS</span>
+    </div>
+    <div onClick="{{ openSettings }}" style="font:600 12.5px/1 Archivo,sans-serif;color:#3d5c47;padding:6px 0;cursor:pointer">Settings</div>
+  </div>
+  <div style="padding:0 18px 10px;display:flex;gap:7px;overflow:auto">
+    <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
+      <div onClick="{{ c.onClick }}" style="flex:none;padding:7px 12px;border-radius:9999px;font:600 11.5px/1 Archivo,sans-serif;cursor:pointer;background:{{ c.bg }};color:{{ c.fg }};border:1px solid {{ c.border }}">{{ c.label }}</div>
+    </sc-for>
+  </div>
+  <div style="display:grid;grid-template-columns:26px 1fr 74px 46px;gap:8px;padding:7px 18px;border-top:1px solid rgba(31,28,23,.12);border-bottom:1px solid rgba(31,28,23,.12);font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">
+    <span>QTY</span><span>CARD</span><span>SET · №</span><span style="text-align:right">A$</span>
+  </div>
+  <div style="flex:1;overflow:auto;padding-bottom:104px">
+    <sc-for list="{{ rows }}" as="r" hint-placeholder-count="9">
+      <div onClick="{{ r.onClick }}" style="display:grid;grid-template-columns:26px 1fr 74px 46px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(31,28,23,.07);cursor:pointer" style-hover="background:#eae4d6">
+        <span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459">{{ r.qty }}</span>
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:0">
+          <span style="font:600 15px/1.15 Lora,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.name }}</span>
+          <span style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8a8172">{{ r.meta }}</span>
+        </div>
+        <span style="font:500 10.5px/1.3 JetBrains Mono,monospace;color:#6b6459">{{ r.code }}</span>
+        <span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:{{ r.priceColor }}">{{ r.price }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isDecks }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#f2ede2;display:flex;flex-direction:column;padding-top:59px">
+  <div style="padding:8px 18px 12px;display:flex;flex-direction:column;gap:2px">
+    <span style="font:600 27px/1.1 Lora,serif">Sunbird Storm</span>
+    <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#8a8172">COMMANDER DECK · UPDATED 2 DAYS AGO</span>
+  </div>
+  <div style="margin:0 18px;display:flex;align-items:stretch;border:1px solid rgba(31,28,23,.12);border-radius:12px;overflow:hidden;background:#faf7f0">
+    <div style="flex:1;padding:12px 14px;border-right:1px solid rgba(31,28,23,.09)">
+      <div style="font:700 22px/1 JetBrains Mono,monospace;color:#8f6b2f">98</div>
+      <div style="font:500 10px/1.3 Archivo,sans-serif;color:#6b6459;margin-top:4px">physical cards</div>
+    </div>
+    <div style="flex:1;padding:12px 14px;border-right:1px solid rgba(31,28,23,.09)">
+      <div style="font:700 22px/1 JetBrains Mono,monospace">1</div>
+      <div style="font:500 10px/1.3 Archivo,sans-serif;color:#6b6459;margin-top:4px">commander</div>
+    </div>
+    <div style="flex:1;padding:12px 14px">
+      <div style="font:700 22px/1 JetBrains Mono,monospace">A$740</div>
+      <div style="font:500 10px/1.3 Archivo,sans-serif;color:#6b6459;margin-top:4px">indicative</div>
+    </div>
+  </div>
+  <div style="margin:10px 18px 0;display:flex;gap:8px;align-items:flex-start;padding:10px 12px;border-radius:10px;background:rgba(143,107,47,.1)">
+    <span style="font:700 11px/1.4 JetBrains Mono,monospace;color:#8f6b2f">!</span>
+    <span style="font:400 11.5px/1.4 Archivo,sans-serif;color:#6f5828">98 cards — two short of 100. Duplicate non-basic: Sol Ring ×2.</span>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 74px 58px;gap:8px;padding:7px 18px;margin-top:12px;border-top:1px solid rgba(31,28,23,.12);border-bottom:1px solid rgba(31,28,23,.12);font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">
+    <span>CARD</span><span>SET · №</span><span style="text-align:right">COND</span>
+  </div>
+  <div style="flex:1;overflow:auto;padding-bottom:104px">
+    <div style="display:grid;grid-template-columns:1fr 74px 58px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(31,28,23,.07);background:rgba(61,92,71,.07)">
+      <div style="display:flex;flex-direction:column;gap:2px">
+        <span style="font:600 15px/1.15 Lora,serif">Kaalia of the Vast</span>
+        <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.1em;color:#3d5c47">COMMANDER</span>
+      </div>
+      <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">CMD·196</span>
+      <span style="font:500 10.5px/1 JetBrains Mono,monospace;text-align:right;color:#6b6459">NM</span>
+    </div>
+    <sc-for list="{{ deckRows }}" as="d" hint-placeholder-count="7">
+      <div style="display:grid;grid-template-columns:1fr 74px 58px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(31,28,23,.07)">
+        <span style="font:600 15px/1.15 Lora,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ d.name }}</span>
+        <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">{{ d.code }}</span>
+        <span style="font:500 10.5px/1 JetBrains Mono,monospace;text-align:right;color:#6b6459">{{ d.cond }}</span>
+      </div>
+    </sc-for>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ isValue }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;background:#f2ede2;display:flex;flex-direction:column;padding-top:59px">
+  <div style="padding:8px 18px 12px;display:flex;flex-direction:column;gap:2px">
+    <span style="font:600 27px/1.1 Lora,serif">Value</span>
+    <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#8a8172">THRESHOLD A$20 · REFRESHED TODAY 08:12</span>
+  </div>
+  <div style="flex:1;overflow:auto;padding-bottom:104px">
+    <div style="padding:9px 18px;background:rgba(61,92,71,.1);border-top:1px solid rgba(31,28,23,.1);border-bottom:1px solid rgba(31,28,23,.1);display:flex;flex-direction:column;gap:2px">
+      <span style="font:600 11.5px/1 Archivo,sans-serif;color:#2f4a38">Check with MTG Mate — Near Mint only</span>
+      <span style="font:400 10.5px/1.35 Archivo,sans-serif;color:#5b6b5f">Indicative only. Verify current acceptance terms on their buylist.</span>
+    </div>
+    <sc-for list="{{ nmValue }}" as="v" hint-placeholder-count="4">
+      <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)">
+        <span style="font:500 12px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">{{ v.qty }}</span>
+        <div style="flex:1;display:flex;flex-direction:column;gap:2px;min-width:0">
+          <span style="font:600 15px/1.15 Lora,serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ v.name }}</span>
+          <span style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8a8172">{{ v.meta }}</span>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:2px">
+          <span style="font:600 13px/1 JetBrains Mono,monospace;color:#8f6b2f">{{ v.total }}</span>
+          <span style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8a8172">{{ v.unit }} ea</span>
+        </div>
+      </div>
+    </sc-for>
+    <div style="padding:9px 18px;background:rgba(31,28,23,.05);border-top:1px solid rgba(31,28,23,.1);border-bottom:1px solid rgba(31,28,23,.1);font:600 11.5px/1 Archivo,sans-serif;color:#6b6459">Valuable, played or damaged</div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)">
+      <span style="font:500 12px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">1</span>
+      <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+        <span style="font:600 15px/1.15 Lora,serif">Mana Crypt</span>
+        <span style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8a8172">EMA · 225 · NON-FOIL · PLAYED</span>
+      </div>
+      <span style="font:600 13px/1 JetBrains Mono,monospace;color:#6b6459">A$196.00</span>
+    </div>
+    <div style="margin:14px 18px 0;padding:14px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;display:flex;flex-direction:column;gap:8px">
+      <span style="font:400 11.5px/1.5 Archivo,sans-serif;color:#6b6459">Prices are indicative retail-market data from Scryfall (USD), converted at the ECB daily rate. Never a confirmed offer.</span>
+      <span style="font:600 13px/1 Archivo,sans-serif;color:#3d5c47">Open MTG Mate buylist →</span>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showDetail }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:30;background:#f2ede2;display:flex;flex-direction:column;padding-top:59px;overflow:auto">
+  <div style="padding:6px 18px 8px;display:flex;align-items:center;justify-content:space-between">
+    <div onClick="{{ closeDetail }}" style="font:600 13px/1 Archivo,sans-serif;color:#3d5c47;cursor:pointer">← Collection</div>
+    <div style="font:600 13px/1 Archivo,sans-serif;color:#3d5c47;cursor:pointer">Edit</div>
+  </div>
+  <div style="padding:6px 18px 0;display:flex;gap:16px">
+    <div style="width:132px;height:184px;border-radius:8px;flex:none;background:repeating-linear-gradient(135deg,#e3ddcd 0 6px,#d8d1bf 6px 12px);display:flex;align-items:flex-end;padding:8px;box-sizing:border-box">
+      <span style="font:500 8.5px/1.3 JetBrains Mono,monospace;color:#8a8172">card art<br>cached URL</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:7px;min-width:0">
+      <span style="font:600 25px/1.1 Lora,serif">{{ detailName }}</span>
+      <span style="font:400 12px/1.4 Archivo,sans-serif;color:#6b6459">{{ detailType }}</span>
+      <div style="display:flex;flex-direction:column;gap:3px;margin-top:2px">
+        <span style="font:500 10px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">EXACT PRINTING</span>
+        <span style="font:500 12.5px/1.45 JetBrains Mono,monospace;color:#1f1c17">{{ detailPrinting }}</span>
+      </div>
+    </div>
+  </div>
+  <div style="margin:18px 18px 0;border:1px solid rgba(31,28,23,.12);border-radius:12px;background:#faf7f0;overflow:hidden">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(31,28,23,.07)">
+      <span style="font:500 12px/1 Archivo,sans-serif;color:#6b6459">Indicative value</span>
+      <span style="font:600 14px/1 JetBrains Mono,monospace;color:{{ detailPriceColor }}">{{ detailPrice }}</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid rgba(31,28,23,.07)">
+      <span style="font:500 12px/1 Archivo,sans-serif;color:#6b6459">Physical copies</span>
+      <span style="font:600 14px/1 JetBrains Mono,monospace">{{ detailQty }}</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px">
+      <span style="font:500 12px/1 Archivo,sans-serif;color:#6b6459">Location</span>
+      <span style="font:600 13px/1 Archivo,sans-serif">{{ detailLocation }}</span>
+    </div>
+  </div>
+  <div style="margin:12px 18px 0;display:flex;flex-direction:column;gap:0;border:1px solid rgba(31,28,23,.12);border-radius:12px;background:#faf7f0;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(31,28,23,.07);font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">COPIES — EACH TRACKED SEPARATELY</div>
+    <sc-for list="{{ copies }}" as="c" hint-placeholder-count="3">
+      <div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(31,28,23,.05)">
+        <span style="font:500 10px/1 JetBrains Mono,monospace;color:#8a8172;flex:1">{{ c.id }}</span>
+        <span style="font:500 11px/1 JetBrains Mono,monospace;color:#6b6459">{{ c.cond }}</span>
+        <span style="font:600 11.5px/1 Archivo,sans-serif">{{ c.loc }}</span>
+      </div>
+    </sc-for>
+  </div>
+  <div style="margin:14px 18px 34px;display:flex;gap:10px">
+    <div onClick="{{ openMove }}" style="flex:1;text-align:center;padding:15px;border-radius:12px;background:#3d5c47;color:#f4f0e6;font:600 14px/1 Archivo,sans-serif;cursor:pointer">Move…</div>
+    <div style="flex:none;padding:15px 18px;border-radius:12px;border:1px solid rgba(31,28,23,.16);font:600 14px/1 Archivo,sans-serif;cursor:pointer">Delete</div>
+  </div>
+
+  <sc-if value="{{ showMove }}" hint-placeholder-val="{{ false }}">
+  <div style="position:absolute;inset:0;z-index:40;background:rgba(14,12,10,.5);display:flex;align-items:flex-end">
+    <div style="width:100%;background:#f2ede2;border-radius:22px 22px 0 0;padding:20px 20px 46px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.13em;color:#8a8172">MOVE ONE COPY</span>
+        <span style="font:600 20px/1.15 Lora,serif">{{ detailName }}</span>
+        <span style="font:400 11.5px/1.4 Archivo,sans-serif;color:#6b6459">Moving changes the copy's location. It does not create a duplicate.</span>
+      </div>
+      <sc-for list="{{ destinations }}" as="dest" hint-placeholder-count="3">
+        <div onClick="{{ dest.onClick }}" style="display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border:1px solid rgba(31,28,23,.14);border-radius:12px;background:#faf7f0;cursor:pointer" style-hover="border-color:#3d5c47">
+          <span style="font:600 14.5px/1 Archivo,sans-serif">{{ dest.label }}</span>
+          <span style="font:500 11px/1 JetBrains Mono,monospace;color:#8a8172">{{ dest.count }}</span>
+        </div>
+      </sc-for>
+      <div onClick="{{ closeMove }}" style="text-align:center;font:600 13px/1 Archivo,sans-serif;color:#6b6459;padding:8px;cursor:pointer">Cancel</div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ showSettings }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:30;background:#f2ede2;display:flex;flex-direction:column;padding-top:59px;overflow:auto">
+  <div style="padding:6px 18px 8px"><div onClick="{{ closeSettings }}" style="font:600 13px/1 Archivo,sans-serif;color:#3d5c47;cursor:pointer">← Collection</div></div>
+  <div style="padding:2px 18px 14px;font:600 27px/1.1 Lora,serif">Settings</div>
+  <div style="margin:0 18px;border:1px solid rgba(31,28,23,.12);border-radius:12px;background:#faf7f0;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(31,28,23,.07);font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">SCANNING</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid rgba(31,28,23,.06)">
+      <span style="font:500 13.5px/1 Archivo,sans-serif">High-value threshold</span>
+      <span style="font:600 13px/1 JetBrains Mono,monospace">A$20.00</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid rgba(31,28,23,.06)">
+      <span style="font:500 13.5px/1 Archivo,sans-serif">Default condition</span>
+      <span style="font:600 13px/1 Archivo,sans-serif;color:#6b6459">Near Mint</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px">
+      <div style="display:flex;flex-direction:column;gap:2px;padding-right:12px">
+        <span style="font:500 13.5px/1 Archivo,sans-serif">Auto-add confidence gate</span>
+        <span style="font:400 10.5px/1.35 Archivo,sans-serif;color:#8a8172">Below this, cards go to review</span>
+      </div>
+      <span style="font:600 13px/1 JetBrains Mono,monospace">0.85</span>
+    </div>
+  </div>
+  <div style="margin:12px 18px;border:1px solid rgba(31,28,23,.12);border-radius:12px;background:#faf7f0;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(31,28,23,.07);font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">BACKUP</div>
+    <div style="padding:13px 14px;border-bottom:1px solid rgba(31,28,23,.06);display:flex;flex-direction:column;gap:3px">
+      <span style="font:500 13.5px/1 Archivo,sans-serif">Last backup</span>
+      <span style="font:500 11px/1 JetBrains Mono,monospace;color:#6b6459">29 AUG 2026 · 18:04 · 4,912 COPIES · INTEGRITY OK</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border-bottom:1px solid rgba(31,28,23,.06)">
+      <span style="font:600 13.5px/1 Archivo,sans-serif;color:#3d5c47">Create .bowerkeep backup</span>
+      <span style="font:500 11px/1 JetBrains Mono,monospace;color:#8a8172">Files · AirDrop</span>
+    </div>
+    <div style="padding:13px 14px;display:flex;flex-direction:column;gap:3px">
+      <span style="font:600 13.5px/1 Archivo,sans-serif;color:#3d5c47">Restore from backup…</span>
+      <span style="font:400 10.5px/1.4 Archivo,sans-serif;color:#8a8172">Counts are shown for review first. The current database is kept as a rollback.</span>
+    </div>
+  </div>
+  <div style="margin:0 18px 34px;border:1px solid rgba(31,28,23,.12);border-radius:12px;background:#faf7f0;overflow:hidden">
+    <div style="padding:10px 14px;border-bottom:1px solid rgba(31,28,23,.07);font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#8a8172">EXPORT</div>
+    <div style="padding:13px 14px;display:flex;flex-direction:column;gap:3px">
+      <span style="font:600 13.5px/1 Archivo,sans-serif;color:#3d5c47">Export CSV</span>
+      <span style="font:400 10.5px/1.4 Archivo,sans-serif;color:#8a8172">For inspection and sharing. Not a restore format.</span>
+    </div>
+  </div>
+</div>
+</sc-if>
+
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;left:0;right:0;bottom:0;height:82px;z-index:12;display:flex;align-items:flex-start;background:{{ tabBg }};border-top:1px solid {{ tabBorder }};padding-top:9px">
+  <sc-for list="{{ tabs }}" as="tb" hint-placeholder-count="4">
+    <div onClick="{{ tb.onClick }}" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer">
+      <div style="width:20px;height:20px;border-radius:{{ tb.radius }};background:{{ tb.markBg }};border:1.5px solid {{ tb.markBorder }}"></div>
+      <span style="font:600 10px/1 Archivo,sans-serif;letter-spacing:.02em;color:{{ tb.color }}">{{ tb.label }}</span>
+    </div>
+  </sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;left:18px;right:18px;bottom:{{ toastBottom }};z-index:50;background:#1f1c17;border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:10px">
+  <span style="font:400 12.5px/1.35 Archivo,sans-serif;color:#f4f0e6;flex:1">{{ toast }}</span>
+  <span style="font:600 12px/1 Archivo,sans-serif;color:#c8b06a">Undo</span>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Scan overlay — ledger strip: readout is a low card at the bottom, camera stays wide</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:#14120f;font-family:Archivo,system-ui,sans-serif">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,#211d18 0 9px,#1a1712 9px 18px);opacity:.85"></div>
+  <div style="position:absolute;top:64px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between">
+    <span style="font:500 10px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:rgba(244,240,230,.55)">COLLECTION · NM</span>
+    <span style="font:500 10px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:#c8b06a">DONE</span>
+  </div>
+  <div style="position:absolute;top:120px;left:0;right:0;bottom:250px;display:flex;align-items:center;justify-content:center">
+    <div style="width:250px;height:350px;border-radius:12px;border:2px solid rgba(200,176,106,.55);box-shadow:0 0 0 9999px rgba(20,18,15,.5)"></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:34px;background:#f2ede2;border-radius:20px 20px 0 0;padding:16px 18px 18px;display:flex;flex-direction:column;gap:12px">
+    <div style="display:flex;align-items:baseline;gap:8px">
+      <span style="font:600 21px/1.1 Lora,serif;color:#1f1c17;flex:1">Arcane Signet</span>
+      <span style="font:500 9.5px/1 JetBrains Mono,monospace;letter-spacing:.1em;color:#3d5c47">LOCKED 0.97</span>
+    </div>
+    <div style="display:flex;gap:0;border:1px solid rgba(31,28,23,.14);border-radius:10px;overflow:hidden;background:#faf7f0">
+      <div style="flex:1;padding:9px 11px;border-right:1px solid rgba(31,28,23,.1)"><div style="font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">SET</div><div style="font:500 12.5px/1 JetBrains Mono,monospace;margin-top:4px">ELD</div></div>
+      <div style="flex:1;padding:9px 11px;border-right:1px solid rgba(31,28,23,.1)"><div style="font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">№</div><div style="font:500 12.5px/1 JetBrains Mono,monospace;margin-top:4px">331</div></div>
+      <div style="flex:1;padding:9px 11px"><div style="font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">A$</div><div style="font:500 12.5px/1 JetBrains Mono,monospace;margin-top:4px">4.10</div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="display:flex;flex-direction:column"><span style="font:700 24px/1 JetBrains Mono,monospace">47</span><span style="font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8a8172">SESSION</span></div>
+      <div style="flex:1;height:52px;border-radius:12px;background:#3d5c47;display:flex;align-items:center;justify-content:center;font:600 14.5px/1 Archivo,sans-serif;color:#f4f0e6">Capture</div>
+      <span style="font:600 12.5px/1 Archivo,sans-serif;color:#6b6459">Undo</span>
+    </div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Scan overlay — corner tally only: full-bleed camera, readout collapses to one line above the shutter</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:#14120f;font-family:Archivo,system-ui,sans-serif">
+  <div style="position:absolute;inset:0;background:repeating-linear-gradient(115deg,#211d18 0 9px,#1a1712 9px 18px);opacity:.9"></div>
+  <div style="position:absolute;top:70px;right:18px;text-align:right">
+    <div style="font:700 34px/1 JetBrains Mono,monospace;color:#f4f0e6">47</div>
+    <div style="font:500 9px/1 JetBrains Mono,monospace;letter-spacing:.12em;color:rgba(244,240,230,.5);margin-top:4px">INTO COLLECTION</div>
+  </div>
+  <div style="position:absolute;top:70px;left:18px;width:112px;display:flex;flex-direction:column;gap:5px">
+    <div style="height:3px;width:100%;background:#3d5c47;border-radius:2px"></div>
+    <span style="font:500 9px/1.3 JetBrains Mono,monospace;color:rgba(244,240,230,.5)">STEADY · FOCUS OK</span>
+  </div>
+  <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center">
+    <div style="position:relative;width:268px;height:374px">
+      <div style="position:absolute;left:0;top:0;width:34px;height:34px;border-left:3px solid #f4f0e6;border-top:3px solid #f4f0e6;border-radius:10px 0 0 0"></div>
+      <div style="position:absolute;right:0;top:0;width:34px;height:34px;border-right:3px solid #f4f0e6;border-top:3px solid #f4f0e6;border-radius:0 10px 0 0"></div>
+      <div style="position:absolute;left:0;bottom:0;width:34px;height:34px;border-left:3px solid #f4f0e6;border-bottom:3px solid #f4f0e6;border-radius:0 0 0 10px"></div>
+      <div style="position:absolute;right:0;bottom:0;width:34px;height:34px;border-right:3px solid #f4f0e6;border-bottom:3px solid #f4f0e6;border-radius:0 0 10px 0"></div>
+    </div>
+  </div>
+  <div style="position:absolute;left:18px;right:18px;bottom:150px;display:flex;align-items:baseline;gap:9px">
+    <span style="font:600 22px/1.1 Lora,serif;color:#f4f0e6">Sol Ring</span>
+    <span style="font:500 12px/1 JetBrains Mono,monospace;color:rgba(244,240,230,.6)">C21 · 263 · EN</span>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:44px;height:96px;display:flex;align-items:center;justify-content:center">
+    <div style="width:76px;height:76px;border-radius:9999px;background:#f4f0e6;box-shadow:0 0 0 5px rgba(244,240,230,.16)"></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Navigation — two tabs plus a persistent scan bar: Collection and Decks only, scanning always one thumb-reach away</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:#f2ede2;font-family:Archivo,system-ui,sans-serif;color:#1f1c17;display:flex;flex-direction:column;padding-top:59px">
+  <div style="padding:8px 18px 12px;display:flex;gap:18px;align-items:baseline;border-bottom:1px solid rgba(31,28,23,.12)">
+    <span style="font:600 24px/1.1 Lora,serif">Collection</span>
+    <span style="font:400 24px/1.1 Lora,serif;color:#b3ab99">Decks</span>
+    <span style="font:400 24px/1.1 Lora,serif;color:#b3ab99">Value</span>
+  </div>
+  <div style="padding:11px 18px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(31,28,23,.08)">
+    <span style="font:500 11.5px/1 JetBrains Mono,monospace;color:#8a8172;flex:1">SEARCH NAME, SET OR №</span>
+    <span style="font:500 11.5px/1 JetBrains Mono,monospace;color:#3d5c47">FILTERS 2</span>
+  </div>
+  <div style="flex:1;overflow:hidden">
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">4</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Sol Ring</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">C21·263</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">1</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Cyclonic Rift</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">RTR·51</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">2</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Arcane Signet</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">ELD·331</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">1</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Rhystic Study</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">PCY·45</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">1</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Mana Crypt</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">EMA·225</span></div>
+    <div style="display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(31,28,23,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#6b6459;width:20px">3</span><span style="font:600 15px/1.15 Lora,serif;flex:1">Lightning Greaves</span><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#6b6459">2XM·268</span></div>
+  </div>
+  <div style="position:absolute;left:14px;right:14px;bottom:44px;height:60px;border-radius:16px;background:#1f1c17;display:flex;align-items:center;padding:0 8px 0 18px;gap:12px">
+    <span style="font:600 14.5px/1 Archivo,sans-serif;color:#f4f0e6;flex:1">Scan into Collection</span>
+    <div style="width:44px;height:44px;border-radius:9999px;background:#f4f0e6"></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Type and colour — night ledger: same table, dark warm ground, ochre accent, mono-forward</div>
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" hint-size="402px,874px">
+<div style="position:absolute;inset:0;background:#191713;font-family:Archivo,system-ui,sans-serif;color:#efe9db;display:flex;flex-direction:column;padding-top:59px">
+  <div style="padding:8px 18px 10px;display:flex;flex-direction:column;gap:3px">
+    <span style="font:500 10px/1 JetBrains Mono,monospace;letter-spacing:.13em;color:#8e8674">EVERY CARD IN ITS PLACE</span>
+    <span style="font:600 27px/1.1 Lora,serif;color:#f4efe2">Collection</span>
+    <span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#8e8674">4,912 COPIES · 1,806 PRINTINGS</span>
+  </div>
+  <div style="padding:0 18px 10px;display:flex;gap:7px">
+    <div style="padding:7px 12px;border-radius:9999px;background:#c8a24e;color:#191713;font:600 11.5px/1 Archivo,sans-serif">All</div>
+    <div style="padding:7px 12px;border-radius:9999px;border:1px solid rgba(239,233,219,.2);color:#c2baa6;font:600 11.5px/1 Archivo,sans-serif">Foil</div>
+    <div style="padding:7px 12px;border-radius:9999px;border:1px solid rgba(239,233,219,.2);color:#c2baa6;font:600 11.5px/1 Archivo,sans-serif">A$20+</div>
+    <div style="padding:7px 12px;border-radius:9999px;border:1px solid rgba(239,233,219,.2);color:#c2baa6;font:600 11.5px/1 Archivo,sans-serif">In decks</div>
+  </div>
+  <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;padding:7px 18px;border-top:1px solid rgba(239,233,219,.14);border-bottom:1px solid rgba(239,233,219,.14);font:500 8.5px/1 JetBrains Mono,monospace;letter-spacing:.11em;color:#8e8674"><span>QTY</span><span>CARD</span><span>SET · №</span><span style="text-align:right">A$</span></div>
+  <div style="flex:1;overflow:hidden">
+    <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(239,233,219,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#a89f8b">4</span><div><div style="font:600 15px/1.15 Lora,serif">Sol Ring</div><div style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8e8674;margin-top:3px">NON-FOIL · NM · COLLECTION</div></div><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#a89f8b">C21·263</span><span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:#a89f8b">7.20</span></div>
+    <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(239,233,219,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#a89f8b">1</span><div><div style="font:600 15px/1.15 Lora,serif">Cyclonic Rift</div><div style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8e8674;margin-top:3px">FOIL · NM · SUNBIRD STORM</div></div><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#a89f8b">RTR·51</span><span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:#c8a24e">88.10</span></div>
+    <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(239,233,219,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#a89f8b">1</span><div><div style="font:600 15px/1.15 Lora,serif">Rhystic Study</div><div style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8e8674;margin-top:3px">NON-FOIL · NM · COLLECTION</div></div><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#a89f8b">PCY·45</span><span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:#c8a24e">61.40</span></div>
+    <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(239,233,219,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#a89f8b">2</span><div><div style="font:600 15px/1.15 Lora,serif">Arcane Signet</div><div style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8e8674;margin-top:3px">NON-FOIL · NM · COLLECTION</div></div><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#a89f8b">ELD·331</span><span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:#a89f8b">4.10</span></div>
+    <div style="display:grid;grid-template-columns:26px 1fr 74px 52px;gap:8px;align-items:center;padding:11px 18px;border-bottom:1px solid rgba(239,233,219,.07)"><span style="font:500 12.5px/1 JetBrains Mono,monospace;color:#a89f8b">1</span><div><div style="font:600 15px/1.15 Lora,serif">Mana Crypt</div><div style="font:500 9.5px/1 JetBrains Mono,monospace;color:#8e8674;margin-top:3px">NON-FOIL · PLAYED · COLLECTION</div></div><span style="font:500 10.5px/1 JetBrains Mono,monospace;color:#a89f8b">EMA·225</span><span style="font:600 11.5px/1 JetBrains Mono,monospace;text-align:right;color:#c8a24e">196.00</span></div>
+  </div>
+  <div style="position:absolute;left:0;right:0;bottom:0;height:82px;display:flex;align-items:flex-start;padding-top:9px;background:#141210;border-top:1px solid rgba(239,233,219,.12)">
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:5px;border:1.5px solid #8e8674"></div><span style="font:600 10px/1 Archivo,sans-serif;color:#8e8674">Scan</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:5px;background:#c8a24e"></div><span style="font:600 10px/1 Archivo,sans-serif;color:#c8a24e">Collection</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:5px;border:1.5px solid #8e8674"></div><span style="font:600 10px/1 Archivo,sans-serif;color:#8e8674">Decks</span></div>
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:20px;height:20px;border-radius:9999px;border:1.5px solid #8e8674"></div><span style="font:600 10px/1 Archivo,sans-serif;color:#8e8674">Value</span></div>
+  </div>
+</div>
+</x-import>
+</div>
+
+</div>
+<p class="dv-next">Try next: "keep <a href="#1a">1a</a> but use the <a href="#1b">1b</a> readout strip" · "apply <a href="#1e">1e</a>'s dark ground to the scan flow only" · "add the ambiguous-review and manual-search screens"</p>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+const P = (s) => s;
+class Component extends DCLogic {
+  state = {
+    tab: 'scan', stage: 0, sheet: null, count: 47, toast: null,
+    tally: [], filter: 'All', detail: null, move: false, settings: false, summary: false,
+    moved: {},
+  };
+
+  data = [
+    { name: 'Sol Ring', qty: '4', code: 'C21·263', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 7.2, type: 'Artifact', printing: 'Commander 2021 · 263 · EN\nnon-foil · Near Mint', ids: ['A1F4', '9C22', '4B70', 'E118'] },
+    { name: 'Cyclonic Rift', qty: '1', code: 'RTR·51', fin: 'FOIL', cond: 'NM', loc: 'Sunbird Storm', price: 88.1, type: 'Instant', printing: 'Return to Ravnica · 51 · EN\nfoil · Near Mint', ids: ['77D1'] },
+    { name: 'Rhystic Study', qty: '1', code: 'PCY·45', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 61.4, type: 'Enchantment', printing: 'Prophecy · 45 · EN\nnon-foil · Near Mint', ids: ['22AE'] },
+    { name: 'Arcane Signet', qty: '2', code: 'ELD·331', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 4.1, type: 'Artifact', printing: 'Throne of Eldraine · 331 · EN\nnon-foil · Near Mint', ids: ['5501', 'B0C9'] },
+    { name: 'Mana Crypt', qty: '1', code: 'EMA·225', fin: 'NON-FOIL', cond: 'PLAYED', loc: 'Collection', price: 196, type: 'Artifact', printing: 'Eternal Masters · 225 · EN\nnon-foil · Played', ids: ['D4A2'] },
+    { name: 'Lightning Greaves', qty: '3', code: '2XM·268', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 3.6, type: 'Artifact', printing: 'Double Masters · 268 · EN\nnon-foil · Near Mint', ids: ['1A9B', '6F3C', 'CC40'] },
+    { name: 'Smothering Tithe', qty: '1', code: 'RNA·22', fin: 'NON-FOIL', cond: 'NM', loc: 'Sunbird Storm', price: 44.8, type: 'Enchantment', printing: 'Ravnica Allegiance · 22 · EN\nnon-foil · Near Mint', ids: ['8E55'] },
+    { name: 'Counterspell', qty: '2', code: 'ICE·64', fin: 'NON-FOIL', cond: 'PLAYED', loc: 'Collection', price: 2.9, type: 'Instant', printing: 'Ice Age · 64 · EN\nnon-foil · Played', ids: ['3C7F', 'AA19'] },
+    { name: 'Dockside Extortionist', qty: '1', code: 'C19·2', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 118.5, type: 'Creature', printing: 'Commander 2019 · 2 · EN\nnon-foil · Near Mint', ids: ['7B21'] },
+    { name: 'Command Tower', qty: '6', code: 'C21·280', fin: 'NON-FOIL', cond: 'NM', loc: 'Collection', price: 1.1, type: 'Land', printing: 'Commander 2021 · 280 · EN\nnon-foil · Near Mint', ids: ['0011', '0012', '0013', '0014', '0015', '0016'] },
+  ];
+
+  deckRows = [
+    { name: 'Sol Ring', code: 'C21·263', cond: 'NM' },
+    { name: 'Cyclonic Rift', code: 'RTR·51', cond: 'NM' },
+    { name: 'Smothering Tithe', code: 'RNA·22', cond: 'NM' },
+    { name: 'Command Tower', code: 'C21·280', cond: 'NM' },
+    { name: 'Arcane Signet', code: 'ELD·331', cond: 'PL' },
+    { name: 'Fellwar Stone', code: 'CMR·307', cond: 'NM' },
+    { name: 'Path to Exile', code: 'MM3·22', cond: 'NM' },
+    { name: 'Swords to Plowshares', code: 'STA·22', cond: 'NM' },
+  ];
+
+  aud = (n) => 'A$' + n.toFixed(2);
+
+  loc = (r) => this.state.moved[r.name] || r.loc;
+
+  setTab = (t) => this.setState({ tab: t, summary: false, detail: null, settings: false, move: false, sheet: null, toast: null });
+
+  shutter = () => {
+    const s = this.state;
+    if (s.stage === 0) {
+      this.setState({ stage: 1, count: s.count + 1, tally: [{ name: 'Sol Ring', code: 'C21·263' }] });
+    } else if (s.stage === 1) {
+      this.setState({ sheet: 'finish', stage: 2 });
+    } else {
+      this.setState({ sheet: 'review', stage: 3 });
+    }
+  };
+
+  pickFinish = (label, price) => this.setState((s) => ({
+    sheet: null, stage: 1, count: s.count + 1,
+    tally: [{ name: 'Cyclonic Rift · ' + label, code: 'RTR·51' }, ...s.tally].slice(0, 3),
+    toast: 'Cyclonic Rift added — ' + price + ' indicative, over your A$20 threshold',
+  }));
+
+  renderVals() {
+    const s = this.state;
+    const locked = s.stage >= 1;
+    const rows = this.data.filter((r) => {
+      if (s.filter === 'Foil') return r.fin === 'FOIL';
+      if (s.filter === 'A$20+') return r.price >= 20;
+      if (s.filter === 'In decks') return this.loc(r) !== 'Collection';
+      return true;
+    });
+    const chipStyle = (on) => on
+      ? { bg: '#3d5c47', fg: '#f4f0e6', border: '#3d5c47' }
+      : { bg: 'transparent', fg: '#6b6459', border: 'rgba(31,28,23,.18)' };
+    const d = s.detail;
+    const deckCount = this.data.filter((r) => this.loc(r) !== 'Collection').length;
+    const dark = s.tab === 'scan' && !s.summary;
+
+    const tabs = [
+      ['scan', 'Scan', '5px'], ['collection', 'Collection', '3px'],
+      ['decks', 'Decks', '3px'], ['value', 'Value', '9999px'],
+    ].map(([id, label, radius]) => {
+      const on = s.tab === id && !s.summary;
+      const accent = dark ? '#c8b06a' : '#3d5c47';
+      const off = dark ? 'rgba(244,240,230,.45)' : '#8a8172';
+      return {
+        label, radius, onClick: () => this.setTab(id),
+        markBg: on ? accent : 'transparent',
+        markBorder: on ? accent : off,
+        color: on ? accent : off,
+      };
+    });
+
+    return {
+      isScan: s.tab === 'scan' && !s.summary,
+      isCollection: s.tab === 'collection' && !s.detail && !s.settings,
+      isDecks: s.tab === 'decks',
+      isValue: s.tab === 'value',
+      isSummary: s.summary,
+      showDetail: !!d, showSettings: s.settings, showMove: s.move,
+      showTabs: !s.detail && !s.settings && !s.summary,
+      showTally: s.tally.length > 0 && !s.sheet && !s.toast,
+      tabs,
+      showFinish: s.sheet === 'finish', showReview: s.sheet === 'review',
+      toast: s.toast,
+      toastBottom: dark ? '250px' : '96px',
+
+      ocrTitle: locked ? 'Sol Ring' : 'Reading…',
+      ocrSet: locked ? 'C21' : '— —',
+      ocrNum: locked ? '263' : '—',
+      ocrLang: locked ? 'EN' : '—',
+      lockLabel: locked ? 'LOCKED 0.96' : 'HOLD STEADY',
+      ocrLine: locked ? 'C21 · 263 · EN' : '— · — · —',
+      steadyLabel: locked ? 'STEADY · FOCUS OK' : 'SEEKING EDGES',
+      guideColor: locked ? '#5c8a6b' : 'rgba(244,240,230,.28)',
+      readoutColor: locked ? '#f4f0e6' : 'rgba(244,240,230,.45)',
+      conf1: locked ? '96%' : '18%', conf2: locked ? '92%' : '10%', conf3: locked ? '99%' : '6%',
+      undoColor: s.tally.length ? '#f4f0e6' : 'rgba(244,240,230,.35)',
+      tallyCount: s.count, tally: s.tally,
+
+      shutter: this.shutter,
+      undo: () => this.setState((st) => st.tally.length ? { tally: st.tally.slice(1), count: st.count - 1, toast: null } : {}),
+      endSession: () => this.setState({ summary: true, sheet: null }),
+      backToScan: () => this.setState({ summary: false, tab: 'scan', stage: 0, tally: [], toast: null }),
+      reviewUnresolved: () => this.setState({ summary: false, tab: 'scan', sheet: 'review', stage: 3 }),
+      pickNonFoil: () => this.pickFinish('non-foil', 'A$42.60'),
+      pickFoil: () => this.pickFinish('foil', 'A$88.10'),
+      pickEtched: () => this.pickFinish('etched', 'no price'),
+      pickCandidate: () => this.setState((st) => ({
+        sheet: null, stage: 1, count: st.count + 1,
+        tally: [{ name: 'Counterspell', code: 'ICE·64' }, ...st.tally].slice(0, 3),
+        toast: 'Counterspell filed as Ice Age · 64',
+      })),
+
+      copyCount: '4,912', printingCount: '1,806',
+      chips: ['All', 'Foil', 'A$20+', 'In decks'].map((label) => ({
+        label, ...chipStyle(s.filter === label),
+        onClick: () => this.setState({ filter: label }),
+      })),
+      rows: rows.map((r) => ({
+        qty: r.qty, name: r.name, code: r.code, price: this.aud(r.price),
+        meta: r.fin + ' · ' + r.cond + ' · ' + this.loc(r).toUpperCase(),
+        priceColor: r.price >= 20 ? '#8f6b2f' : '#6b6459',
+        onClick: () => this.setState({ detail: r, toast: null }),
+      })),
+
+      deckRows: this.deckRows,
+
+      nmValue: this.data.filter((r) => r.price >= 20 && r.cond === 'NM').map((r) => ({
+        qty: r.qty, name: r.name, unit: this.aud(r.price), total: this.aud(r.price * parseInt(r.qty, 10)),
+        meta: r.code.replace('·', ' · ') + ' · ' + r.fin + ' · NM',
+      })),
+
+      detailName: d ? d.name : '', detailType: d ? d.type : '',
+      detailPrinting: d ? d.printing : '',
+      detailPrice: d ? this.aud(d.price) : '',
+      detailPriceColor: d && d.price >= 20 ? '#8f6b2f' : '#1f1c17',
+      detailQty: d ? d.qty : '', detailLocation: d ? this.loc(d) : '',
+      copies: d ? d.ids.map((id, i) => ({
+        id: 'COPY ' + id, cond: i === 0 ? d.cond : 'NM',
+        loc: i === 0 ? this.loc(d) : d.loc,
+      })) : [],
+      closeDetail: () => this.setState({ detail: null, move: false }),
+      openMove: () => this.setState({ move: true }),
+      closeMove: () => this.setState({ move: false }),
+      destinations: [
+        { label: 'Collection', count: 4912 - deckCount + ' copies' },
+        { label: 'Sunbird Storm', count: '98 cards' },
+        { label: 'Tidal Barter', count: '100 cards' },
+      ].map((dest) => ({
+        ...dest,
+        onClick: () => this.setState((st) => ({
+          move: false,
+          moved: { ...st.moved, [st.detail.name]: dest.label },
+          toast: st.detail.name + ' moved to ' + dest.label,
+        })),
+      })),
+
+      openSettings: () => this.setState({ settings: true }),
+      closeSettings: () => this.setState({ settings: false }),
+      tabBg: dark ? '#14120f' : '#f2ede2',
+      tabBorder: dark ? 'rgba(244,240,230,.12)' : 'rgba(31,28,23,.12)',
+    };
+  }
+}
+</script>
+</body>
+</html>
